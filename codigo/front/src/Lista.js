@@ -32,7 +32,7 @@ export default function Lista() {
         <FormGroup>
           <Label for='valor'>Valor</Label>
           <CurrencyFormat
-            class="form-control"
+            className="form-control"
             value={valor}
             displayType={"input"}
             prefix={"R$ "}
