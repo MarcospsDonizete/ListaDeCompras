@@ -9,17 +9,16 @@ export default function Produto() {
     const [produtos, setProdutos] = useState([])
 
     const verifica = (teste) => {
-        let temp = [];
-        console.log(produtos[0].nome)
-        if (produtos.length>0) {
-            produtos.map(item => temp.push(item.nome.replaceAll(" ", "")))
-                (temp.every(no => no !== teste))
-        }
-        if (temp.every(no => no !== teste) && temp !== []) {
+        let temp=[];
+        busca(teste);
+        produtos.map(item => temp.push(item.nome))
+        console.log(temp.every(no => no !== teste),teste)
+        if (temp.every(no => no !== teste)) {
             return true
         } else {
             return false
         }
+
     }
 
     const busca = (buscar) => {
@@ -28,7 +27,7 @@ export default function Produto() {
             setProdutos([])
         }
         else {
-            api.post('/selectproduto', { nome: buscar })
+            api.post('/selectproduto', { nome: buscar.trim()})
                 .then(response => {
                     if (!response.data.erro)
                         setProdutos(response.data.result)
@@ -43,7 +42,7 @@ export default function Produto() {
         if (nome.trim() === '')
             setErro('Forneça o nome')
         else {
-            if (verifica(nome)) {
+            if (verifica(nome.trim())) {
                 api.post('/insertproduto', { nome })
                     .then(response => {
                         if (response.data.erro)
@@ -85,7 +84,7 @@ export default function Produto() {
                 }
                 <Col lg='4' md='6' sm='12'>
                     <Label for='nome'>Nome</Label>
-                    <Input bssize="sm" type="text" id="nome" value={nome} onChange={e => busca(e.target.value)} />
+                    <Input bssize="sm" type="text" id="nome" value={nome} onChange={e => busca(e.target.value.replace("  "," "))} />
                 </Col>
 
                 <Col sm='12'>
