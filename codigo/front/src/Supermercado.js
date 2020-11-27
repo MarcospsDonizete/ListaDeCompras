@@ -10,14 +10,12 @@ export default function Supermercado(props) {
     const [uf, setUf] = useState('')
     const [nro, setNro] = useState('')
     const latitude = ''
-    const longitude = ''
+    const longitude = ''    
     const [erro, setErro] = useState('')
     const [sucesso, setSucesso] = useState('')
     const [supermercados, setSupermercados] = useState([])
 
     useEffect(() => load(), []);
-
-    console.log('props', props.login)
 
     const load = () => {
         api.post('/selectsupermercado')

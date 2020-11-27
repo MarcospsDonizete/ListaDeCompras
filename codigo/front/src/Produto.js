@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Col, Row, Alert, Input, Button, FormGroup, Label } from "reactstrap"
+import { Col, Row, Alert, Input, Button, Label } from "reactstrap"
 import api from './api'
 
 export default function Produto() {
@@ -9,15 +9,15 @@ export default function Produto() {
     const [produtos, setProdutos] = useState([])
 
     const busca = (buscar) => {
+        setNome(buscar)
         if (buscar === "") {
-            setProdutos('')
+            setProdutos([])
         }
         else {
             api.post('/selectproduto', { nome: buscar })
                 .then(response => {
                     if (!response.data.erro)
                         setProdutos(response.data.result)
-                    console.log(response.data.result)
                 })
                 .catch(e => console.log(e.message))
         }
@@ -29,25 +29,41 @@ export default function Produto() {
         if (nome.trim() === '')
             setErro('Forneça o nome')
         else {
-            api.post('/insertproduto', { nome })
-                .then(response => {
+            let flag;
+            produtos.map((item) => {
+              if(item.nome.trim()!==nome.trim()){
+                return flag = true;
+              }
+              return flag = false;
+            })
+           
 
-                    if (response.data.erro)
-                        setErro(response.data.erro)
-                    else {
-                        setSucesso('Produto registrado com sucesso')
-                        clear()
-                    }
-                })
-                .catch(e => console.log(e.message))
+            if (flag || !produtos) {
+                api.post('/insertproduto', { nome })
+                    .then(response => {
+                        if (response.data.erro)
+                            setErro(response.data.erro)
+                        else {
+                            setSucesso('Produto registrado com sucesso')
+                            clear()
+                        }
+                    })
+                    .catch(e => console.log(e.message))
+            }
+            else {
+                setErro("Produto já cadastrado");
+
+            }
         }
     }
 
     const clear = () => {
         setNome('')
+        setProdutos([])
     }
     return (
         <>
+
             <Row>
                 <Col sm='12' className='mb-2'>
                     <h6>Cadastro de Produto</h6>
@@ -64,20 +80,11 @@ export default function Produto() {
                 }
                 <Col lg='4' md='6' sm='12'>
                     <Label for='nome'>Nome</Label>
-                    <Input bssize="sm" type="text" id="nome" value={nome} onChange={e => setNome(e.target.value)} />
+                    <Input bssize="sm" type="text" id="nome" value={nome} onChange={e => busca(e.target.value)} />
                 </Col>
 
                 <Col sm='12'>
                     <Button style={{ margin: '15px 0px 15px' }} onClick={insert}>Cadastrar</Button>
-                </Col>
-            </Row>
-
-            <Row>
-                <Col lg='4' md='6' sm='12'>
-                    <FormGroup>
-                        <Label for='buscar'>Buscar produtos</Label>
-                        <Input type="text" id="buscar" onChange={e => busca(e.target.value)} />
-                    </FormGroup>
                 </Col>
             </Row>
             {produtos.length > 0 &&
