@@ -8,6 +8,20 @@ export default function Produto() {
     const [sucesso, setSucesso] = useState('')
     const [produtos, setProdutos] = useState([])
 
+    const verifica = (teste) => {
+        let temp = [];
+        console.log(produtos[0].nome)
+        if (produtos.length>0) {
+            produtos.map(item => temp.push(item.nome.replaceAll(" ", "")))
+                (temp.every(no => no !== teste))
+        }
+        if (temp.every(no => no !== teste) && temp !== []) {
+            return true
+        } else {
+            return false
+        }
+    }
+
     const busca = (buscar) => {
         setNome(buscar)
         if (buscar === "") {
@@ -29,16 +43,7 @@ export default function Produto() {
         if (nome.trim() === '')
             setErro('Forneça o nome')
         else {
-            let flag;
-            produtos.map((item) => {
-              if(item.nome.trim()!==nome.trim()){
-                return flag = true;
-              }
-              return flag = false;
-            })
-           
-
-            if (flag || !produtos) {
+            if (verifica(nome)) {
                 api.post('/insertproduto', { nome })
                     .then(response => {
                         if (response.data.erro)
