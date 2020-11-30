@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react"
 import { Col, Row, FormGroup, Label, Input, Button, Alert } from "reactstrap"
-import { Link } from 'react-router-dom'
 import CurrencyFormat from "react-currency-format";
 import api from './api'
 
@@ -111,7 +110,6 @@ export default function Lista(props) {
             error(response.data.erro)
         })
     }
-   
   }
 
   const editar = (idEditar, nomeEditar) => {
@@ -168,16 +166,11 @@ export default function Lista(props) {
     setValor(0)
     setProdutos([])
     setLista([])
-
   }
 
   const salvar = () => {
     setFlagLista(false)
     clear()
-  }
-
-  const recarga = () => {
-    setErro(' ')
   }
 
   const error = (error) => {
@@ -188,11 +181,6 @@ export default function Lista(props) {
   const sucess = (sucess) => {
     setSucesso(sucess)
     setTimeout(function () { setSucesso(''); }, 3000);
-  }
-
-  const verifica = (v) => {
-    console.log(lista)
-
   }
 
   const set = () => {
@@ -306,7 +294,6 @@ export default function Lista(props) {
             </Row>)}
           </Col>}
       </Row>
-      <Button style={{ margin: '15px 0px 15px' }} onClick={verifica}>Cveriahsgd</Button>
     </>
   )
 }
