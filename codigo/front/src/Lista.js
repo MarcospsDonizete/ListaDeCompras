@@ -13,12 +13,11 @@ export default function Lista(props) {
   const [listaCompras, setListaCompras] = useState([])
   const [idsupermercado, setIdSupermercado] = useState(0)
   const [idProduto, setIdProduto] = useState(0)
+  const [idLista, setIdLista] = useState(0)
   const [erro, setErro] = useState('')
   const [sucesso, setSucesso] = useState('')
   const [lista, setLista] = useState([])
   const [total, setTotal] = useState(0)
-  const [temp, setTemp] = useState(0)
-
   const [flagLista, setFlagLista] = useState(Boolean)
 
   useEffect(() => load(), []);
@@ -41,7 +40,6 @@ export default function Lista(props) {
       })
       .catch(e => console.log(e.message))
   }
-
 
   const busca = (buscar) => {
     setNomeProduto(buscar)
@@ -93,22 +91,75 @@ export default function Lista(props) {
             load()
             load2()
             clear()
+
           }
         })
         .catch(e => console.log(e.message))
     }
   }
+
   const addProdutoLista = (idLista) => {
+    setIdLista(idLista)
     if (produtos.length > 1) {
       sucess('Especifique o produto')
     } else {
 
       api.post('/insertprodutoporlista', { idlista: idLista, idproduto: idProduto, valor: valor })
         .then(response => {
+          montaLista(idLista)
           if (response.data.erro)
             error(response.data.erro)
         })
     }
+   
+  }
+
+  const editar = (idEditar, nomeEditar) => {
+    setIdProduto(idEditar)
+    setNomeProduto(nomeEditar)
+    deletarProduto(idEditar)
+  }
+
+  const deletarProduto = (idDelete) => {
+    {
+      api.post('/deleteprodutoporlista', { idlista: idLista, idproduto: idDelete })
+        .then(response => {
+          if (response.data.erro)
+            error(response.data.erro)
+        })
+        .catch(e => console.log(e.message))
+    }
+    setTimeout(() => {
+      montaLista(idLista)
+    }, 10)
+  }
+
+  const deletarLista = (idDelete) => {
+    setFlagLista(false)
+    api.post('/deletelista', { idlista: idDelete })
+      .then(response => {
+        if (response.data.erro)
+          error(response.data.erro)
+      })
+      .catch(e => console.log(e.message))
+  }
+
+  const updatelista = () => {
+    addProdutoLista(idLista)
+    clear()
+  }
+
+  const montaLista = (key) => {
+    setFlagLista(true)
+    setIdLista(parseInt(key))
+
+    api.post('/selectprodutoporlista', { idlista: key })
+      .then(response => {
+        if (!response.data.erro)
+          setLista(response.data.result)
+      })
+      .catch(e => console.log(e.message))
+    load2()
   }
 
   const clear = () => {
@@ -117,6 +168,7 @@ export default function Lista(props) {
     setValor(0)
     setProdutos([])
     setLista([])
+
   }
 
   const salvar = () => {
@@ -124,20 +176,8 @@ export default function Lista(props) {
     clear()
   }
 
-  const updatelista = () => {
-    setFlagLista(false)
-    clear()
-  }
-
-  const montaLista = (key) => {
-    setFlagLista(true)
-
-    api.post('/selectprodutoporlista', { idlista: key })
-      .then(response => {
-        if (!response.data.erro)
-          setLista(response.data.result)
-      })
-      .catch(e => console.log(e.message))
+  const recarga = () => {
+    setErro(' ')
   }
 
   const error = (error) => {
@@ -188,31 +228,33 @@ export default function Lista(props) {
                 {supermercados.map((item, key) => <option key={key.idsupermercado} value={item.nome} />)}
               </datalist>
 
-              {!flagLista &&
-                <Row className='m-0'>
-                  <Label for='listaProduto' >Produto</Label>
-                  <Input type="text" id="listaProduto" list='produtos' value={nomeProduto} onChange={e => busca(e.target.value.replace("  ", " "))} />
-                  <datalist id='produtos'>
-                    {produtos.map((item, key) => <option key={key.idprodutos} value={item.nome} />)}
-                  </datalist>
+              <Row className='m-0'>
+                <Label for='listaProduto' >Produto</Label>
+                <Input type="text" id="listaProduto" list='produtos' value={nomeProduto} onChange={e => busca(e.target.value.replace("  ", " "))} />
+                <datalist id='produtos'>
+                  {produtos.map((item, key) => <option key={key.idprodutos} value={item.nome} />)}
+                </datalist>
 
-                  <Label for='valor'>Valor</Label>
-                  <CurrencyFormat
-                    className="form-control"
-                    value={valor}
-                    displayType={"input"}
-                    prefix={"R$ "}
-                    decimalSeparator={","}
-                    decimalScale={2}
-                    fixedDecimalScale={false}
-                    allowNegative={false}
-                    onValueChange={values => {
-                      const { floatValue } = values;
-                      setValor(floatValue);
-                    }}
-                  />
-                  <Button style={{ margin: '15px 0px 15px' }} onClick={salvaLista}>Cadastrar nova lista</Button>
-                </Row>}
+                <Label for='valor'>Valor</Label>
+                <CurrencyFormat
+                  className="form-control"
+                  value={valor}
+                  displayType={"input"}
+                  prefix={"R$ "}
+                  decimalSeparator={","}
+                  decimalScale={2}
+                  fixedDecimalScale={false}
+                  allowNegative={false}
+                  onValueChange={values => {
+                    const { floatValue } = values;
+                    setValor(floatValue);
+                  }}
+                />
+                <Button style={{ margin: '15px 0px 15px' }} onClick={salvaLista}>Cadastrar nova lista</Button>
+                {flagLista &&
+                  <Button style={{ margin: '15px 15px 15px' }} onClick={updatelista}>Adicionar produto</Button>
+                }
+              </Row>
             </FormGroup>
             <Col sm='12'>
             </Col>
@@ -225,40 +267,15 @@ export default function Lista(props) {
                 <h6>Lista de Compras</h6>
               </Col>
               <Col sm='6' className='font-weight-bold'>Nome da Lista</Col>
-              {flagLista &&
-                <Row className='m-0'>
-                  <Label for='listaProduto' >Produto</Label>
-                  <Input type="text" id="listaProduto" list='produtos' value={nomeProduto} onChange={e => busca(e.target.value.replace("  ", " "))} />
-                  <datalist id='produtos'>
-                    {produtos.map((item, key) => <option key={key.idprodutos} value={item.nome} />)}
-                  </datalist>
-
-                  <Label for='valor'>Valor</Label>
-                  <CurrencyFormat
-                    className="form-control"
-                    value={valor}
-                    displayType={"input"}
-                    prefix={"R$ "}
-                    decimalSeparator={","}
-                    decimalScale={2}
-                    fixedDecimalScale={false}
-                    allowNegative={false}
-                    onValueChange={values => {
-                      const { floatValue } = values;
-                      setValor(floatValue);
-                    }}
-                  />
-                </Row>}
               <Row>
-                <Button style={{ margin: '15px 15px 15px' }} onClick={updatelista}>Adiciona produto</Button>
-                <Button style={{ margin: '15px 15px 15px' }} onClick={salvar}>Salvar Lista</Button>
+                <Button style={{ margin: '15px 30px 15px' }} onClick={salvar}>Salvar Lista</Button>
               </Row>
-              <Col sm="12" className="border" style={{ maxHeight: 200 }}>
+              <Col sm="12" className="border overflow-auto" style={{ maxHeight: 200 }}>
                 {lista.map(item => <Row className='border-bottom pt-2 pb-1'>
                   <Col className='font-weight-bold' sm='5'>{item.nome}</Col>
-                  <Col sm='3'>R${item.valor}</Col>
-                  <Col sm='2'><Link>Editar</Link></Col>
-                  <Col sm='2'><Link>Excluir</Link></Col>
+                  <Col sm='2'>R${item.valor}</Col>
+                  <Col sm='2'><button id={item.idproduto} name={item.nome} onClick={e => editar(e.target.id, e.target.name)} className="border-0 btn btn-link mp-0">Editar</button></Col>
+                  <Col sm='2'><button id={item.idproduto} onClick={e => deletarProduto(e.target.id)} className="border-0 btn btn-link mp-0">Excluir</button></Col>
                 </Row>)}
                 {set()}
                 <Row sm='12' className='font-weight-bold pt-2 pb-1'>
@@ -282,6 +299,9 @@ export default function Lista(props) {
               </Col>
               <Col className="float-right" id={item.idlista}>
                 {item.datahorario}
+              </Col>
+              <Col sm='2'><button id={item.idlista} onClick={e => deletarLista(e.target.id)} className="border-0 btn btn-link mp-0">
+                Excluir</button>
               </Col>
             </Row>)}
           </Col>}
