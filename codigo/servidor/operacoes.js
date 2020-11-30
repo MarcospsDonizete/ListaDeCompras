@@ -144,8 +144,12 @@ const updateSupermercado = (req, res) => {
 const selectLista = (req, res) => {
     const bd = new sqlite3.Database(database, sqlite3.OPEN_READONLY)
     bd.all(
-        'select idlista,idsupermercado,datahorario from tblista where idusuario=? order by datahorario desc limit 10',
-        [req.body.idusuario],
+        "select a.idlista,a.idsupermercado,strftime('%d/%m/%Y %H:%M',a.datahorario) as 'datahorario', b.nome " +
+        "from tblista as a, tbsupermercado as b " +
+        "where a.idsupermercado = b.idsupermercado and idusuario=? " +
+        "order by datahorario desc " +
+        "limit 10",
+        [req.user.id],
         (error, rows) => {
             if (error)
                 res.send({ erro: error.message })
@@ -159,7 +163,7 @@ const selectLista = (req, res) => {
 const insertLista = (req, res) => {
     const bd = new sqlite3.Database(database, sqlite3.OPEN_READWRITE)
     bd.run('insert into tblista(idsupermercado,idusuario,datahorario) values (?,?,datetime())',
-        [req.body.idsupermercado, req.body.idusuario],
+        [req.body.idsupermercado, req.user.id],
         function (error) {
             if (error)
                 res.send({ erro: error.message })

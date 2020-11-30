@@ -81,18 +81,18 @@ app.all('/login',
 app.get('/logout', function (req, res) {
     req.logout()
     if (!req.user)
-        res.send({ nome: '', mail: '' })
+        res.send({id: 0, nome: '', mail: '' })
     else
-        res.send({ nome: req.user.nome, mail: req.user.mail })
+        res.send({id: req.user.id, nome: req.user.nome, mail: req.user.mail })
 });
 
 app.get('/currentuser', (req, res) => {
     if (req.user) {
-        let { nome, mail } = req.user
-        res.send({ nome, mail })
+        let { id, nome, mail } = req.user
+        res.send({ id, nome, mail })
     }
     else
-        res.send({ nome: '', mail: '' })
+        res.send({ id: 0, nome: '', mail: '' })
 })
 
 // curl -X POST -d "nome=a" http://localhost:3101/selectproduto
@@ -106,18 +106,18 @@ app.post('/updateproduto', op.updateProduto)
 
 // curl -X POST http://localhost:3101/selectsupermercado
 app.post('/selectsupermercado', (req, res) => {
-    if( req.user )
+    if (req.user)
         op.selectSupermercado(req, res)
     else
-        res.send({erro:'Efetue o login para continuar'})
+        res.send({ erro: 'Efetue o login para continuar' })
 })
 
 // curl -X POST -d "nome=Supermercado D&logradouro=Rua d&bairro=Campo&cidade=Jacareí&uf=SP&nro=&latitude=-15.32&longitude=-45.21" http://localhost:3101/insertsupermercado
-app.post('/insertsupermercado', (req, res) =>{
-    if( req.user )
+app.post('/insertsupermercado', (req, res) => {
+    if (req.user)
         op.insertSupermercado(req, res)
     else
-        res.send({erro:'Efetue o login para continuar'})
+        res.send({ erro: 'Efetue o login para continuar' })
 })
 
 // curl -X POST -d "idsupermercado=4&nome=Supermercado D&logradouro=Rua d&bairro=Campo Limpo&cidade=Jacareí&uf=SP&nro=&latitude=-15.32&longitude=-45.21" http://localhost:3101/updatesupermercado

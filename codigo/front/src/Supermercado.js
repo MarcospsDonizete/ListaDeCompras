@@ -10,7 +10,7 @@ export default function Supermercado(props) {
     const [uf, setUf] = useState('')
     const [nro, setNro] = useState('')
     const latitude = ''
-    const longitude = ''    
+    const longitude = ''
     const [erro, setErro] = useState('')
     const [sucesso, setSucesso] = useState('')
     const [supermercados, setSupermercados] = useState([])
@@ -27,18 +27,16 @@ export default function Supermercado(props) {
     }
 
     const insert = () => {
-        setErro('')
-        setSucesso('')
         if (nome.trim() === '')
-            setErro('Forneça o nome do supermercado')
+            error('Forneça o nome do supermercado')
         else
             api.post('/insertsupermercado', { nome, logradouro, bairro, cidade, uf, nro, latitude, longitude })
                 .then(response => {
                     console.log(response.data)
                     if (response.data.erro)
-                        setErro(response.data.erro)
+                        error(response.data.erro)
                     else {
-                        setSucesso('Supermercado registrado com sucesso')
+                        sucess('Supermercado registrado com sucesso')
                         clear()
                         load()
                     }
@@ -53,7 +51,15 @@ export default function Supermercado(props) {
         setCidade('')
         setUf('')
         setNro('')
+    }
+    const error = (error) => {
+        setErro(error)
+        setTimeout(function () { setErro(''); }, 3000);
+    }
 
+    const sucess = (sucess) => {
+        setSucesso(sucess)
+        setTimeout(function () { setSucesso(''); }, 3000);
     }
 
     return (

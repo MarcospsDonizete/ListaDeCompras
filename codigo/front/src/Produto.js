@@ -9,10 +9,9 @@ export default function Produto() {
     const [produtos, setProdutos] = useState([])
 
     const verifica = (teste) => {
-        let temp=[];
+        let temp = [];
         busca(teste);
         produtos.map(item => temp.push(item.nome))
-        console.log(temp.every(no => no !== teste),teste)
         if (temp.every(no => no !== teste)) {
             return true
         } else {
@@ -27,7 +26,7 @@ export default function Produto() {
             setProdutos([])
         }
         else {
-            api.post('/selectproduto', { nome: buscar.trim()})
+            api.post('/selectproduto', { nome: buscar.trim() })
                 .then(response => {
                     if (!response.data.erro)
                         setProdutos(response.data.result)
@@ -37,25 +36,24 @@ export default function Produto() {
     }
 
     const insert = () => {
-        setErro('')
-        setSucesso('')
+
         if (nome.trim() === '')
-            setErro('Forneça o nome')
+            error('Forneça o nome')
         else {
             if (verifica(nome.trim())) {
                 api.post('/insertproduto', { nome })
                     .then(response => {
                         if (response.data.erro)
-                            setErro(response.data.erro)
+                            error(response.data.erro)
                         else {
-                            setSucesso('Produto registrado com sucesso')
+                            sucess('Produto registrado com sucesso')
                             clear()
                         }
                     })
                     .catch(e => console.log(e.message))
             }
             else {
-                setErro("Produto já cadastrado");
+                error("Produto já cadastrado");
 
             }
         }
@@ -64,6 +62,15 @@ export default function Produto() {
     const clear = () => {
         setNome('')
         setProdutos([])
+    }
+    const error = (error) => {
+        setErro(error)
+        setTimeout(function () { setErro(''); }, 3000);
+    }
+
+    const sucess = (sucess) => {
+        setSucesso(sucess)
+        setTimeout(function () { setSucesso(''); }, 3000);
     }
     return (
         <>
@@ -84,7 +91,7 @@ export default function Produto() {
                 }
                 <Col lg='4' md='6' sm='12'>
                     <Label for='nome'>Nome</Label>
-                    <Input bssize="sm" type="text" id="nome" value={nome} onChange={e => busca(e.target.value.replace("  "," "))} />
+                    <Input bssize="sm" type="text" id="nome" value={nome} onChange={e => busca(e.target.value.replace("  ", " "))} />
                 </Col>
 
                 <Col sm='12'>

@@ -10,7 +10,7 @@ import { Container, Row, Col } from 'reactstrap'
 import api from './api'
 
 export default function App() {
-  const [login, setLogin] = useState({ nome: '', mail: '' })
+  const [login, setLogin] = useState({ idusuario:0,nome: '', mail: '' })
 
   useEffect(() => {
     api.get('/currentuser')
@@ -33,12 +33,12 @@ export default function App() {
           <Route
             path="/"
             exact={true}
-            component={() => <Lista />}
+            component={() => <Lista login={login} />}
           />
           <Route
             path="/lista"
             exact={true}
-            component={() => <Lista />}
+            component={() => <Lista login={login}/>}
           />
           <Route
             path="/supermercado"
