@@ -7,16 +7,16 @@ export default function Lista(props) {
   const [nomeSupermercado, setNomeSupermercado] = useState('')
   const [nomeProduto, setNomeProduto] = useState('')
   const [supermercados, setSupermercado] = useState([])
-  const [valor, setValor] = useState(0)
   const [produtos, setProdutos] = useState([])
-  const [listaCompras, setListaCompras] = useState([])
+  const [valor, setValor] = useState(0)
+  const [listaCadastradas, setListaCadastradas] = useState([])
   const [idsupermercado, setIdSupermercado] = useState(0)
   const [idProduto, setIdProduto] = useState(0)
   const [idLista, setIdLista] = useState(0)
-  const [erro, setErro] = useState('')
-  const [sucesso, setSucesso] = useState('')
   const [lista, setLista] = useState([])
   const [total, setTotal] = useState(0)
+  const [erro, setErro] = useState('')
+  const [sucesso, setSucesso] = useState('')
   const [flagLista, setFlagLista] = useState(Boolean)
 
   useEffect(() => load(), []);
@@ -35,7 +35,7 @@ export default function Lista(props) {
     api.post('/selectlista', { id: props.login.id })
       .then(response => {
         if (!response.data.erro)
-          setListaCompras(response.data.result)
+          setListaCadastradas(response.data.result)
       })
       .catch(e => console.log(e.message))
   }
@@ -107,7 +107,7 @@ export default function Lista(props) {
         .then(response => {
           montaLista(idLista)
           if (response.data.erro)
-            error(response.data.erro)
+            error("Lista não encontrada")
         })
     }
   }
@@ -119,14 +119,12 @@ export default function Lista(props) {
   }
 
   const deletarProduto = (idDelete) => {
-    {
-      api.post('/deleteprodutoporlista', { idlista: idLista, idproduto: idDelete })
-        .then(response => {
-          if (response.data.erro)
-            error(response.data.erro)
-        })
-        .catch(e => console.log(e.message))
-    }
+    api.post('/deleteprodutoporlista', { idlista: idLista, idproduto: idDelete })
+      .then(response => {
+        if (response.data.erro)
+          error(response.data.erro)
+      })
+      .catch(e => console.log(e.message))
     setTimeout(() => {
       montaLista(idLista)
     }, 10)
@@ -251,12 +249,10 @@ export default function Lista(props) {
         <Col md='6' sm='12'>
           {lista.length > 0 &&
             <Row>
-              <Col sm='6'>
-                <h6>Lista de Compras</h6>
-              </Col>
-              <Col sm='6' className='font-weight-bold'>Nome da Lista</Col>
               <Row>
-                <Button style={{ margin: '15px 30px 15px' }} onClick={salvar}>Salvar Lista</Button>
+                <Col sm='12'>
+                  <Label className='font-weight-bold'>Lista de Compras</Label>
+                </Col>
               </Row>
               <Col sm="12" className="border overflow-auto" style={{ maxHeight: 200 }}>
                 {lista.map(item => <Row className='border-bottom pt-2 pb-1'>
@@ -271,17 +267,20 @@ export default function Lista(props) {
                   <Col sm='5'>R${total}</Col>
                 </Row>
               </Col>
+              <Row>
+                <Button style={{ margin: '15px 30px 15px' }} onClick={salvar}>Salvar Lista</Button>
+              </Row>
             </Row>}
 
         </Col>
       </Row>
       <Row sm='12'>
-        {listaCompras.length > 0 &&
+        {listaCadastradas.length > 0 &&
           <Col className="mt-4">
             <Row className='mb-2'>
               <h6>Listas Cadastradas</h6>
             </Row>
-            {listaCompras.map(item => <Row key={item.idlista} className='pt-2 pb-1 border' onClick={e => montaLista(e.target.id)}>
+            {listaCadastradas.map(item => <Row key={item.idlista} className='pt-2 pb-1 border' onClick={e => montaLista(e.target.id)}>
               <Col id={item.idlista}>
                 {item.nome}
               </Col>

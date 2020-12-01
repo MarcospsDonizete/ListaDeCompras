@@ -17,7 +17,6 @@ export default function Produto() {
         } else {
             return false
         }
-
     }
 
     const busca = (buscar) => {
@@ -74,7 +73,6 @@ export default function Produto() {
     }
     return (
         <>
-
             <Row>
                 <Col sm='12' className='mb-2'>
                     <h6>Cadastro de Produto</h6>
@@ -108,6 +106,5 @@ export default function Produto() {
                     </Col>
                 </Row>}
         </>
-
     )
 }
