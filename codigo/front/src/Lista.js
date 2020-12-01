@@ -70,6 +70,7 @@ export default function Lista(props) {
   }
 
   const salvaLista = () => {
+    console.log(idLista, idsupermercado,idProduto)
     if (nomeSupermercado.trim().length < 1 || idsupermercado === -1) {
       error("Supermercado não encontrado")
     }
@@ -99,17 +100,12 @@ export default function Lista(props) {
 
   const addProdutoLista = (idLista) => {
     setIdLista(idLista)
-    if (produtos.length > 1) {
-      sucess('Especifique o produto')
-    } else {
-
       api.post('/insertprodutoporlista', { idlista: idLista, idproduto: idProduto, valor: valor })
         .then(response => {
           montaLista(idLista)
           if (response.data.erro)
             error("Lista não encontrada")
         })
-    }
   }
 
   const editar = (idEditar, nomeEditar) => {
